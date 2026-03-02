@@ -1,0 +1,48 @@
+{
+  "name": "smartrabbit-mcp",
+  "version": "1.6.0",
+  "description": "MCP Server for Smart Rabbit Fitness - AI-powered workout program generator with text and React output formats",
+  "main": "index.js",
+  "type": "module",
+  "bin": {
+    "smartrabbit-mcp": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "fitness",
+    "workout",
+    "ai",
+    "smart-rabbit",
+    "claude",
+    "claude-desktop",
+    "training-program",
+    "pubmed",
+    "react"
+  ],
+  "author": "Smart Rabbit Fitness",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/contactjccoaching-wq/smartrabbit-mcp.git"
+  },
+  "homepage": "https://www.smartrabbitfitness.com",
+  "bugs": {
+    "url": "https://github.com/contactjccoaching-wq/smartrabbit-mcp/issues"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "index.js",
+    "README.md",
+    "LICENSE"
+  ]
+}
