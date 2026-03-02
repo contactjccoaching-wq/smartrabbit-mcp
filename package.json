@@ -1,6 +1,6 @@
 {
   "name": "smartrabbit-mcp",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "MCP Server for Smart Rabbit Fitness - AI-powered workout program generator with text and React output formats",
   "main": "index.js",
   "type": "module",

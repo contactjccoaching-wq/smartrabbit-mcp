@@ -9,27 +9,35 @@ import {
 
 const API_URL = "https://smartrabbit-rapidapi.contactjccoaching.workers.dev";
 const PUBMED_BASE = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils";
+const MAX_RETRIES = 3;
+const RETRY_DELAYS = [1000, 2000, 4000]; // ms
 
-// PubMed search queries based on fitness goals
-const PUBMED_QUERIES = {
-  muscle: ["muscle hypertrophy training volume", "resistance training muscle growth"],
-  strength: ["strength training periodization", "maximal strength neural adaptations"],
-  endurance: ["endurance training adaptations", "aerobic capacity resistance training"],
-  weight_loss: ["resistance training fat loss", "high intensity interval training weight"],
-  wellness: ["exercise health benefits", "resistance training quality of life"],
-  definition: ["resistance training body composition", "fat loss muscle retention"]
-};
-
-const LEVEL_MODIFIERS = {
-  beginner: "novice untrained",
-  intermediate: "trained individuals",
-  advanced: "experienced athletes"
-};
+// Fetch with retry + exponential backoff
+async function fetchWithRetry(url, options) {
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const response = await fetch(url, options);
+      if (response.ok) return response;
+      if (response.status >= 500 && attempt < MAX_RETRIES) {
+        console.error(`API returned ${response.status}, retrying (${attempt + 1}/${MAX_RETRIES})...`);
+        await new Promise(r => setTimeout(r, RETRY_DELAYS[attempt]));
+        continue;
+      }
+      return response;
+    } catch (error) {
+      if (attempt < MAX_RETRIES) {
+        console.error(`Fetch failed: ${error.message}, retrying (${attempt + 1}/${MAX_RETRIES})...`);
+        await new Promise(r => setTimeout(r, RETRY_DELAYS[attempt]));
+        continue;
+      }
+      throw error;
+    }
+  }
+}
 
 // Search PubMed for scientific articles
 async function searchPubMed(query, maxResults = 3) {
   try {
-    // Search for article IDs
     const searchUrl = `${PUBMED_BASE}/esearch.fcgi?db=pubmed&term=${encodeURIComponent(query)}&retmax=${maxResults}&retmode=json&sort=relevance`;
     const searchResponse = await fetch(searchUrl);
     const searchData = await searchResponse.json();
@@ -37,7 +45,6 @@ async function searchPubMed(query, maxResults = 3) {
     const ids = searchData.esearchresult?.idlist || [];
     if (ids.length === 0) return [];
 
-    // Get article summaries
     const summaryUrl = `${PUBMED_BASE}/esummary.fcgi?db=pubmed&id=${ids.join(",")}&retmode=json`;
     const summaryResponse = await fetch(summaryUrl);
     const summaryData = await summaryResponse.json();
@@ -63,61 +70,11 @@ async function searchPubMed(query, maxResults = 3) {
   }
 }
 
-// Build search queries based on profile
-function buildPubMedQueries(profile) {
-  const queries = [];
-  const goalQueries = PUBMED_QUERIES[profile.goal] || PUBMED_QUERIES.muscle;
-  const levelMod = LEVEL_MODIFIERS[profile.level] || "";
-
-  // Add goal-specific queries
-  for (const q of goalQueries) {
-    queries.push(`${q} ${levelMod}`.trim());
-  }
-
-  // Add equipment-specific query if relevant
-  if (profile.equipment === "bodyweight") {
-    queries.push("bodyweight exercise muscle activation");
-  }
-
-  // Add limitation-specific query if present
-  if (profile.limitations) {
-    if (profile.limitations.toLowerCase().includes("knee")) {
-      queries.push("knee injury resistance training rehabilitation");
-    }
-    if (profile.limitations.toLowerCase().includes("back") || profile.limitations.toLowerCase().includes("dos")) {
-      queries.push("low back pain resistance exercise");
-    }
-    if (profile.limitations.toLowerCase().includes("shoulder") || profile.limitations.toLowerCase().includes("épaule")) {
-      queries.push("shoulder injury exercise modification");
-    }
-  }
-
-  return queries.slice(0, 3); // Limit to 3 queries
-}
-
-// Format PubMed results for prompt
-function formatPubMedReferences(articles) {
-  if (articles.length === 0) return "";
-
-  let text = "\n\n📚 SCIENTIFIC REFERENCES (PubMed):\n";
-  text += "Use these studies to support your justifications:\n\n";
-
-  for (const article of articles) {
-    text += `• ${article.title}\n`;
-    text += `  ${article.authors} (${article.year}) - ${article.journal}\n`;
-    text += `  PMID: ${article.pmid} | ${article.url}\n\n`;
-  }
-
-  text += "Cite relevant findings from these studies in your physiological and neuromuscular justifications.\n";
-
-  return text;
-}
-
 // Create MCP server
 const server = new Server(
   {
     name: "Smart Rabbit Fitness",
-    version: "1.6.0",
+    version: "1.6.1",
   },
   {
     capabilities: {
@@ -274,8 +231,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const outputFormat = args.format || "text";
       const endpoint = outputFormat === "react" ? "/generate" : "/generate-text";
 
-      // Get the base prompt from API
-      const response = await fetch(`${API_URL}${endpoint}`, {
+      // Get the base prompt from API (with retry)
+      const response = await fetchWithRetry(`${API_URL}${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -513,7 +470,7 @@ FEATURES:
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("🐰 Smart Rabbit Fitness MCP v1.6.0 ready (text + react formats)");
+  console.error("🐰 Smart Rabbit Fitness MCP v1.6.1 ready");
 }
 
 main().catch(console.error);
