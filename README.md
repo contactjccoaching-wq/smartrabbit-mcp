@@ -1,5 +1,8 @@
 # Smart Rabbit MCP Server
 
+[![Stars](https://img.shields.io/github/stars/contactjccoaching-wq/smartrabbit-mcp?style=social)](https://github.com/contactjccoaching-wq/smartrabbit-mcp)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 MCP (Model Context Protocol) server for [Smart Rabbit Fitness](https://www.smartrabbitfitness.com) — free AI-powered workout program generator.
 
 Works with Claude Desktop, Claude Code, and any MCP-compatible AI assistant.
@@ -181,6 +184,14 @@ Returns all available options for goals, equipment, levels, styles, and formats.
 - **App:** https://www.smartrabbitfitness.com
 - **API:** https://smartrabbit-rapidapi.contactjccoaching.workers.dev
 - **GitHub:** https://github.com/contactjccoaching-wq/smartrabbit-mcp
+
+## Related Projects
+
+- [**immune**](https://github.com/contactjccoaching-wq/immune) — Adaptive memory system — learns patterns from every scan (+85% code quality)
+- [**chimera**](https://github.com/contactjccoaching-wq/chimera) — Bio-inspired 3-stage pipeline (Slime Mold → PRISM → Immune)
+- [**spinal-loop**](https://github.com/contactjccoaching-wq/spinal-loop) — Neuromuscular-inspired agent routing (cheap models first)
+- [**prism-framework**](https://github.com/contactjccoaching-wq/prism-framework) — Multi-agent synthesis via native LLM stochasticity
+- [**daco-framework**](https://github.com/contactjccoaching-wq/daco-framework) — Declarative Agent & MCP Orchestration on Cloudflare Workers
 
 ## License
 
