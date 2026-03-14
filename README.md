@@ -5,6 +5,8 @@
 
 MCP (Model Context Protocol) server for [Smart Rabbit Fitness](https://www.smartrabbitfitness.com) — free AI-powered workout program generator.
 
+![Smart Rabbit MCP](smartrabbit-mcp.png)
+
 Works with Claude Desktop, Claude Code, and any MCP-compatible AI assistant.
 
 ## Features
